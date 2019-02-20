@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -25,6 +26,17 @@ namespace UWP
 {
     public sealed partial class MainPage : Page
     {
+        private bool KeepSending = true;
+        private int loopMessageCount = 0;
+        private int totalMessageCount = 0;
+        private Stopwatch watch = new Stopwatch();
+        private Int64 loopTicksElapsed = 0;
+
+        private ValueSet request = new ValueSet();
+        private ValueSet response = new ValueSet();
+
+        private readonly int PORT_COUNT = 200; // updating 200 points
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -79,7 +91,8 @@ namespace UWP
         /// </summary>
         private async void btnClick_ReadKey(object sender, RoutedEventArgs e)
         {
-            ValueSet request = new ValueSet();
+            request.Clear();
+
             request.Add("KEY", tbKey.Text);
             AppServiceResponse response = await App.Connection.SendMessageAsync(request);
 
@@ -129,6 +142,67 @@ namespace UWP
                 dlg.Commands.Add(noCommand);
                 await dlg.ShowAsync();
             }
+        }
+
+        private async void btnClick_Start(object sender, RoutedEventArgs e)
+        {
+            btnStart.IsEnabled = false;
+            btnStop.IsEnabled = true;
+
+            KeepSending = true;
+            totalMessageCount = 0;
+            loopMessageCount = 0;
+            var start = DateTime.UtcNow;
+            request.Clear();
+            request.Add("PORTS", PORT_COUNT);
+
+            while (KeepSending)
+            {
+                watch.Restart();
+                for (int i = 0; i < PORT_COUNT; i++)
+                {
+                    switch (i % 4)
+                    {
+                        case 0:
+                            request[$"P{i:000}"] = (System.Int32)i;
+                            break;
+                        case 1:
+                            request[$"P{i:000}"] = (System.Single)i;
+                            break;
+                        case 2:
+                            request[$"P{i:000}"] = (System.Byte)i;
+                            break;
+                        case 3:
+                            request[$"P{i:000}"] = (System.UInt16)i;
+                            break;
+                    }
+                }
+
+                AppServiceResponse response = await App.Connection.SendMessageAsync(request);
+                watch.Stop();
+
+                var ticksElapsed = watch.ElapsedTicks;
+                loopTicksElapsed += ticksElapsed;
+                loopMessageCount++;
+
+                if ( loopMessageCount == 60 )
+                {
+                    totalMessageCount += loopMessageCount;
+                    var elapsedmS = (double) TimeSpan.FromTicks(loopTicksElapsed).TotalMilliseconds/(double)loopMessageCount;
+                    loopTicksElapsed = 0;
+                    var totalElapsedTime = (DateTime.UtcNow - start).ToString();
+                    StatsText.Text = $"{loopMessageCount} msgs in {elapsedmS:0.00}mS, {totalMessageCount} messages, elapsed {totalElapsedTime}";
+                    loopMessageCount = 0;
+                }
+            }
+        }
+
+        private void btnClick_Stop(object sender, RoutedEventArgs e)
+        {
+            btnStop.IsEnabled = false;
+            btnStart.IsEnabled = true;
+
+            KeepSending = false;
         }
     }
 }

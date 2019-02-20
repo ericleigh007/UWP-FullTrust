@@ -36,7 +36,7 @@
   <PropertyGroup>
     <ProjectGuid>8a39bb16-7de3-4589-9029-a90b6d143a88</ProjectGuid>
     <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <PackageCertificateKeyFile>Package_StoreKey.pfx</PackageCertificateKeyFile>
     <EntryPointProjectUniqueName>..\UWP\UWP.csproj</EntryPointProjectUniqueName>

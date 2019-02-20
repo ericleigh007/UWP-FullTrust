@@ -20,6 +20,7 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Background="{StaticResource grayGradient}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -34,6 +35,14 @@
             <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Text="Scenario 2 - Handle Requests from Desktop Code" FontSize="20"/>
                 <TextBox Width="500" x:Name="tbRequests" Height="100" AcceptsReturn="True" IsReadOnly="True"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="2" Background="{StaticResource grayGradient}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="Scenario 3 - Test throughput of connection" FontSize="20"/>
+                <Button x:Name="btnStart" Margin="0,3,0,3" Content="Start sending messages" HorizontalAlignment="Stretch" IsEnabled="True" Click="btnClick_Start"/>
+                <Button x:Name="btnStop" Margin="0,3,0,3" Content="Cease sending messages" HorizontalAlignment="Stretch" IsEnabled="True" Click="btnClick_Stop"/>
+                <TextBlock x:Name="StatsText" />
             </StackPanel>
         </Grid>
     </Grid>
