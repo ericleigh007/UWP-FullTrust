@@ -40,6 +40,7 @@
         <Grid Grid.Row="2" Background="{StaticResource grayGradient}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Text="Scenario 3 - Test throughput of connection" FontSize="20"/>
+                <TextBox x:Name="PortCount" Text="port count" InputScope="Number" />
                 <Button x:Name="btnStart" Margin="0,3,0,3" Content="Start sending messages" HorizontalAlignment="Stretch" IsEnabled="True" Click="btnClick_Start"/>
                 <Button x:Name="btnStop" Margin="0,3,0,3" Content="Cease sending messages" HorizontalAlignment="Stretch" IsEnabled="True" Click="btnClick_Stop"/>
                 <TextBlock x:Name="StatsText" />

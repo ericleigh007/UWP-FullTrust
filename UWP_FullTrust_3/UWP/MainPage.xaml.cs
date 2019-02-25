@@ -153,13 +153,24 @@ namespace UWP
             totalMessageCount = 0;
             loopMessageCount = 0;
             var start = DateTime.UtcNow;
-            request.Clear();
-            request.Add("PORTS", PORT_COUNT);
+
+//            var theList = new List<object>() { 10.0F, 9.0F, 8.0F, 3.0F };
+//            var theArray = theList.ToArray();
+            int PORT_UPDATE_COUNT = 100;
+            bool init = true;
 
             while (KeepSending)
             {
+                bool wasInt = Int32.TryParse(PortCount.Text, out int tmp);
+                if ( wasInt && (tmp > 0 && tmp < 1000 ))
+                {
+                    PORT_UPDATE_COUNT = tmp;
+                }
+
                 watch.Restart();
-                for (int i = 0; i < PORT_COUNT; i++)
+                request.Clear();
+                request.Add("PORTS", PORT_UPDATE_COUNT);
+                for (int i = 0; i < PORT_UPDATE_COUNT; i++)
                 {
                     switch (i % 4)
                     {
@@ -176,13 +187,30 @@ namespace UWP
                             request[$"P{i:000}"] = (System.UInt16)i;
                             break;
                     }
+
+                    /*
+                    if ( !init && i == (PORT_UPDATE_COUNT-1))
+                    {
+                        break;
+                    }
+                    */
                 }
 
+                init = false;
+
                 AppServiceResponse response = await App.Connection.SendMessageAsync(request);
+
+                int returnCount = (int)response.Message["PORTS"];
+                for( int j = 0; j < returnCount; j++ )
+                {
+                    object ans = response.Message[$"P{j:000}"];
+                }
+
                 watch.Stop();
 
                 var ticksElapsed = watch.ElapsedTicks;
                 loopTicksElapsed += ticksElapsed;
+                int responsePorts = response.Message.Count-1;  // remove the "PORTS" entry
                 loopMessageCount++;
 
                 if ( loopMessageCount == 60 )
@@ -191,7 +219,7 @@ namespace UWP
                     var elapsedmS = (double) TimeSpan.FromTicks(loopTicksElapsed).TotalMilliseconds/(double)loopMessageCount;
                     loopTicksElapsed = 0;
                     var totalElapsedTime = (DateTime.UtcNow - start).ToString();
-                    StatsText.Text = $"{loopMessageCount} msgs in {elapsedmS:0.00}mS, {totalMessageCount} messages, elapsed {totalElapsedTime}";
+                    StatsText.Text = $"{loopMessageCount} msgs ({PORT_UPDATE_COUNT}/{responsePorts}) in {elapsedmS:0.00}mS, {totalMessageCount} messages, elapsed {totalElapsedTime}";
                     loopMessageCount = 0;
                 }
             }

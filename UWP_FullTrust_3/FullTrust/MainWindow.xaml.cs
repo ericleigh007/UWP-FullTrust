@@ -129,7 +129,10 @@ namespace FullTrust
             else if (request.ContainsKey("PORTS"))
             {
                 var need_init = response.Count == 0;
-                for( int j = 0; j < 200; j++)
+                var PORT_COUNT = (int)request["PORTS"];
+                response.Clear();
+                response["PORTS"] = (object)PORT_COUNT;
+                for( int j = 0; j < PORT_COUNT; j++)
                 {
                     request.TryGetValue($"P{j:000}", out object theValue);
                     switch( theValue )
@@ -150,6 +153,8 @@ namespace FullTrust
 
                     response[$"P{j:000}"] = theValue;
                 }
+
+                await args.Request.SendResponseAsync(response);
             }
         }
 
